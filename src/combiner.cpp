@@ -405,14 +405,24 @@ std::vector<std::vector<combinationResult> > combiner::scanCorrelations(std::ost
     for(size_t i=0;i<syst_scanranges_.size();i++){
 
         std::vector<combinationResult> thisscan(single_correlationscan::nPoints());
+        bool do_scan = true;
         for(size_t step=0;step<single_correlationscan::nPoints();step++){
             combinationResult result;
             combiner combcp=*this;
             for(size_t j=0;j<syst_scanranges_.at(i).size();j++){
+                float nom = syst_scanranges_.at(i).get(j).nominal;
+                float low = syst_scanranges_.at(i).get(j).low;
+                float high = syst_scanranges_.at(i).get(j).high;
+                if (nom == low && nom == high){
+                    do_scan = false;
+                    break;
+                }
+
                 combcp.setSystCorrelation(syst_scanranges_.at(i).get(j).idxa,
                         syst_scanranges_.at(i).get(j).idxb,
                         syst_scanranges_.at(i).get(j).scanVal(step));
             }
+            if (!do_scan) continue;
             combinationResult res;
             try{
                 res=combcp.combine();
