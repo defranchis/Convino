@@ -235,10 +235,11 @@ void combiner::readCorrelationFile(const std::string & filename, bool requiremar
                 cscan.low=atof(range.at(0).data());
                 cscan.high=atof(range.at(1).data());
 
-
             }
             cscans.add(cscan);
             sysnames+=entry.at(1)+"+";
+
+
         }
         sysnames=std::string(sysnames.begin(),sysnames.end()-1);
         //get the name right right away
@@ -305,7 +306,8 @@ void combiner::addMeasurement( measurement m){
     for(const auto& p: allparas){
         for(const auto& p1: m.getParameters()){
             if(p.name() == p1.name())
-                throw std::logic_error("combiner::addMeasurement: uncertainties and estimates must have unique naming: "+(std::string)p.name().Data());
+                // throw std::logic_error("combiner::addMeasurement: uncertainties and estimates must have unique naming: "+(std::string)p.name().Data());
+                std::cout<<"combiner::addMeasurement: WARNING not unique name for: "+(std::string)p.name().Data()<<std::endl;
         }
     }
 
@@ -403,7 +405,6 @@ std::vector<std::vector<combinationResult> > combiner::scanCorrelations(std::ost
     for(size_t i=0;i<syst_scanranges_.size();i++){
 
         std::vector<combinationResult> thisscan(single_correlationscan::nPoints());
-
         for(size_t step=0;step<single_correlationscan::nPoints();step++){
             combinationResult result;
             combiner combcp=*this;
@@ -804,9 +805,12 @@ combinationResult combiner::combinePriv(){
     double det=0;
     inv_priors_.Invert(&det);
     if(!det || det<0){
-        throw std::runtime_error("combiner::combinePriv: external correlations non invertible or not positive definite");
+        if (!det) throw std::runtime_error("combiner::combinePriv: external correlations non invertible");
+        else{
+            std::cout<<"det = "<<det<<std::endl;
+            throw std::runtime_error("combiner::combinePriv: external correlations not positive definite");
+        }
     }
-
 
 
     /*
