@@ -306,8 +306,8 @@ void combiner::addMeasurement( measurement m){
     for(const auto& p: allparas){
         for(const auto& p1: m.getParameters()){
             if(p.name() == p1.name())
-                // throw std::logic_error("combiner::addMeasurement: uncertainties and estimates must have unique naming: "+(std::string)p.name().Data());
-                std::cout<<"combiner::addMeasurement: WARNING not unique name for: "+(std::string)p.name().Data()<<std::endl;
+                throw std::logic_error("combiner::addMeasurement: uncertainties and estimates must have unique naming: "+(std::string)p.name().Data());
+                // std::cout<<"combiner::addMeasurement: WARNING not unique name for: "+(std::string)p.name().Data()<<std::endl;
         }
     }
 
